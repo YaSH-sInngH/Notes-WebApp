@@ -1,8 +1,6 @@
 import {Routes, Route} from 'react-router-dom';
-import Register from './components/register/Register';
-import Login from './components/login/Login';
 import Home from './components/home/Home';
-
+import Dashboard from './components/dashboard/Dashboard';
 
 function App() {
   
@@ -10,6 +8,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/dashboard" element={<Dashboard />} /> 
     </Routes>
   )
 }
