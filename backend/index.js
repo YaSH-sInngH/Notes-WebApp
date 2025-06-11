@@ -13,7 +13,7 @@ app.use('/api', Router);
 app.use('/api/notes', noteRouter);
 
 const PORT = process.env.PORT;
-const URL = process.env.MONGOURI;
+const URL = process.env.MONGO_URI;
 
 Connection(URL);
 app.listen(PORT, () => console.log(`Server is running successfully on PORT ${PORT}`));

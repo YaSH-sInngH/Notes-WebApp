@@ -2,7 +2,6 @@ import Note from "../models/note.js";
 
 //Creating Notes
 export const createNote = async (req, res) => {
-    console.log("req.user:", req.user);
     try{
         const note = new Note({...req.body, user: req.user.id})
         await note.save();
@@ -16,7 +15,6 @@ export const createNote = async (req, res) => {
 
 //Fetching Notes from authenticated users
 export const getNotes = async (req, res) => {
-    console.log("req.user:", req.user);
     try{
         const notes = await Note.find({user: req.user.id, isTrashed: false, isArchived: false})
         res.status(200).json(notes);
@@ -29,7 +27,6 @@ export const getNotes = async (req, res) => {
 
 //Updating Notes
 export const updateNote = async (req, res) => {
-    console.log("req.user:", req.user);
     try{
         const note = await Note.findOneAndUpdate(
             {_id: req.params.id, user: req.user.id },
@@ -48,7 +45,6 @@ export const updateNote = async (req, res) => {
 
 //Deleting Notes
 export const deleteNote = async(req, res)=>{
-    console.log("req.user:", req.user);
     try{
         const note = await Note.findOneAndUpdate(
             {_id: req.params.id, user: req.user.id },
