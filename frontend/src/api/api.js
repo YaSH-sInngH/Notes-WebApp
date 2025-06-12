@@ -19,3 +19,7 @@ export const fetchNotes = () => API.get("/notes");
 export const createNote = (data) => API.post("/notes", data);
 export const updateNote = (id, data) => API.put(`/notes/${id}`, data);
 export const deleteNote = (id) => API.delete(`/notes/${id}`);
+
+export const trashNote = (id) => API.put(`/notes/trash/${id}`);
+export const restoreNote = (id) => API.put(`/notes/restore/${id}`);
+export const fetchTrashedNotes = () => API.get("/notes/trashed");

@@ -46,6 +46,23 @@ export const updateNote = async (req, res) => {
 //Deleting Notes
 export const deleteNote = async(req, res)=>{
     try{
+        const note = await Note.findOneAndDelete(
+            {_id: req.params.id, user: req.user.id },
+            {isTrashed: true},
+            { new: true }
+        );
+        if(!note){
+            return res.status(404).json({ message: "Note not found" });
+        }
+        res.status(200).json({ message: "Note permanently deleted" });
+    }catch(error){
+        console.error(error);
+        res.status(500).json({ message: "Error while deleting note" });
+    }
+}
+
+export const trashNote = async (req, res) => {
+    try{
         const note = await Note.findOneAndUpdate(
             {_id: req.params.id, user: req.user.id },
             {isTrashed: true},
@@ -54,8 +71,36 @@ export const deleteNote = async(req, res)=>{
         if(!note){
             return res.status(404).json({ message: "Note not found" });
         }
+        res.status(200).json(note);
     }catch(error){
         console.error(error);
-        res.status(500).json({ message: "Error while deleting note" });
+        res.status(500).json({ message: "Error while trashing note" });
+    }
+}
+
+export const restoreNote = async (req, res) => {
+    try{
+        const note = await Note.findOneAndUpdate(
+            {_id: req.params.id, user: req.user.id },
+            {isTrashed: false},
+            { new: true }
+        );
+        if(!note){
+            return res.status(404).json({ message: "Note not found" });
+        }
+        res.status(200).json(note);
+    }catch(error){
+        console.error(error);
+        res.status(500).json({ message: "Error while restoring note" });
+    }
+}
+
+export const getTrashedNotes = async (req, res) => {
+    try{
+        const notes = await Note.find({user: req.user.id, isTrashed: true});
+        res.status(200).json(notes);
+    }catch(error){
+        console.error(error);
+        res.status(500).json({ message: "Error while fetching trashed notes" });
     }
 }

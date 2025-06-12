@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchNotes, createNote, updateNote, deleteNote } from '../../api/api';
+import { fetchNotes, createNote, updateNote, deleteNote, trashNote, restoreNote, fetchTrashedNotes } from '../../api/api';
 
 function Dashboard() {
     const [notes, setNotes] = useState([]);
@@ -10,6 +10,8 @@ function Dashboard() {
     const [selectedTag, setSelectedTag] = useState(null);
     const [search, setSearch] = useState('');
     const [sortBy, setSortBy] = useState('pinned');
+    const [showTrash, setShowTrash] = useState(false);
+    const [trashedNotes, setTrashedNotes] = useState([]);
 
     const allTags = Array.from(new Set(notes.flatMap(note => note.tags || [])));
 
@@ -53,6 +55,15 @@ function Dashboard() {
             alert('Failed to update note');
         }
     };
+
+    const loadTrashedNotes = async () => {
+        try {
+            const res = await fetchTrashedNotes();
+            setTrashedNotes(res.data);
+        } catch (error) {
+            alert('Failed to fetch trashed notes');
+        }
+    }
 
     return (
         <div className="p-4 max-w-5xl mx-auto font-sans relative">
@@ -140,6 +151,59 @@ function Dashboard() {
                     </button>
                 ))}
             </div>
+            <button
+                onClick={async () => {
+                    if (showTrash) {
+                        // Going back to notes, so refresh notes
+                        try {
+                            const res = await fetchNotes();
+                            setNotes(res.data);
+                        } catch (error) {
+                            alert('Failed to fetch notes');
+                        }
+                    } else {
+                        // Going to trash, so load trashed notes
+                        await loadTrashedNotes();
+                    }
+                    setShowTrash(!showTrash);
+                }}
+                className="mb-4 bg-gray-700 text-white px-4 py-2 rounded shadow"
+            >
+                {showTrash ? "Back to Notes" : "View Trash"}
+            </button>
+            {showTrash && (
+                <div className="mb-6">
+                    <h3 className="text-2xl font-bold mb-4">🗑️ Trashed Notes</h3>
+                    <ul className="space-y-4">
+                        {trashedNotes.map(note => (
+                            <li key={note._id} className="border rounded-lg p-4 shadow-md bg-gray-100">
+                                <h4 className="text-xl font-bold text-gray-800">{note.title}</h4>
+                                <p className="text-gray-700 mb-3">{note.content}</p>
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={async () => {
+                                            await restoreNote(note._id);
+                                            setTrashedNotes(trashedNotes.filter(n => n._id !== note._id));
+                                        }}
+                                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded shadow"
+                                    >
+                                        Restore
+                                    </button>
+                                    <button
+                                        onClick={async () => {
+                                            await deleteNote(note._id);
+                                            setTrashedNotes(trashedNotes.filter(n => n._id !== note._id));
+                                        }}
+                                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded shadow"
+                                    >
+                                        Delete Permanently
+                                    </button>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
 
             {/* Notes */}
             <ul className="space-y-6">
@@ -223,12 +287,12 @@ function Dashboard() {
                                         </button>
                                         <button
                                             onClick={async () => {
-                                                await deleteNote(note._id);
+                                                await trashNote(note._id);
                                                 setNotes(notes.filter(n => n._id !== note._id));
                                             }}
                                             className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded shadow"
                                         >
-                                            Delete
+                                            Trash
                                         </button>
                                         <button
                                             onClick={async () => {
