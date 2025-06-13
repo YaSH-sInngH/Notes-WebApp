@@ -1,3 +1,9 @@
+const PRESET_COLORS = [
+    "#f44336", "#ff9800", "#ffeb3b", "#8bc34a", "#4caf50",
+    "#009688", "#2196f3", "#3f51b5", "#673ab7", "#9c27b0",
+    "#e040fb", "#ff4081"
+];
+
 function NoteItem({
     note,
     editingNoteId,
@@ -11,7 +17,12 @@ function NoteItem({
     onCancelEditing,
     onSaveEdit,
     onTrashNote,
-    onPinToggle
+    onPinToggle,
+    onArchiveNote,
+    onRestoreNote, 
+    onUnarchiveNote,
+    setEditColor,
+    editColor
 }) {
     const isEditing = editingNoteId === note._id;
     return (
@@ -19,6 +30,7 @@ function NoteItem({
             className={`border rounded-lg p-4 shadow-md transition duration-200 ${
                 note.pinned ? 'bg-blue-50 border-blue-300' : 'bg-white'
             }`}
+            style={{ backgroundColor: note.color || "#fff", borderColor: note.pinned ? "#60a5fa" : "#e5e7eb" }}
         >
             {isEditing ? (
                 <>
@@ -38,6 +50,29 @@ function NoteItem({
                         placeholder="Tags (comma separated)"
                         className="border px-3 py-2 w-full mb-3 rounded shadow-sm"
                     />
+                    <div className="space-y-2 mb-3">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Note Color
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                            {PRESET_COLORS.map((color) => (
+                                <button
+                                    key={color}
+                                    type="button"
+                                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-150
+                                        ${editColor === color ? "border-black scale-110" : "border-gray-200"}
+                                    `}
+                                    style={{ backgroundColor: color }}
+                                    onClick={() => setEditColor(color)}
+                                    aria-label={`Pick color ${color}`}
+                                >
+                                    {editColor === color && (
+                                        <span className="text-white text-lg font-bold">✓</span>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                     <div className="flex gap-3">
                         <button
                             onClick={() => onSaveEdit(note._id)}
@@ -93,6 +128,25 @@ function NoteItem({
                         >
                             {note.pinned ? 'Unpin' : 'Pin'}
                         </button>
+                        {note.isArchived ? (
+                            onUnarchiveNote && (
+                                <button
+                                    onClick={() => onUnarchiveNote(note._id)}
+                                    className="bg-purple-400 hover:bg-purple-600 text-white px-4 py-1 rounded shadow"
+                                >
+                                    Unarchive
+                                </button>
+                            )
+                        ) : (
+                            onArchiveNote && (
+                                <button
+                                    onClick={() => onArchiveNote(note._id)}
+                                    className="bg-purple-500 hover:bg-purple-700 text-white px-4 py-1 rounded shadow"
+                                >
+                                    Archive
+                                </button>
+                            )
+                        )}
                     </div>
                 </>
             )}

@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-import { fetchNotes, createNote, updateNote, deleteNote, trashNote, restoreNote, fetchTrashedNotes } from '../../api/api';
+import { fetchNotes, createNote, updateNote, deleteNote, trashNote, restoreNote, fetchTrashedNotes, archiveNote, unarchiveNote, fetchArchivedNotes } from '../../api/api';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import SearchBar from './SearchBar';
 import NotesList from './NotesList';
 import TrashList from './TrashList';
-import AddTaskModal from './AddTaskModel'
+import AddTaskModal from './AddTaskModel';
+
 
 function Dashboard() {
     const [notes, setNotes] = useState([]);
+    const [archivedNotes, setArchivedNotes] = useState([]);
     const [editingNoteId, setEditingNoteId] = useState(null);
     const [editTitle, setEditTitle] = useState('');
     const [editContent, setEditContent] = useState('');
@@ -20,6 +22,7 @@ function Dashboard() {
     const [activeSection, setActiveSection] = useState('notes');
     const [showAddTaskModal, setShowAddTaskModal] = useState(false);
     const [sortBy, setSortBy] = useState('createdAt');
+    const [editColor, setEditColor] = useState('#ffffff'); // Default color
 
     const allTags = Array.from(new Set(notes.flatMap(note => note.tags || [])));
 
@@ -36,12 +39,13 @@ function Dashboard() {
         }
     };
 
-    const handleAddNote = async ({ title, content, tags }) => {
+    const handleAddNote = async ({ title, content, tags, color }) => {
     try {
         const newNote = {
             title,
             content,
             tags: tags.split(',').map(tag => tag.trim()).filter(Boolean),
+            color
         };
         const res = await createNote(newNote);
         setNotes(prev => [res.data, ...prev]);
@@ -55,6 +59,7 @@ function Dashboard() {
         setEditTitle(note.title);
         setEditContent(note.content);
         setEditTags(note.tags ? note.tags.join(', ') : '');
+        setEditColor(note.color || '#ffffff'); // Set color if available
     };
 
     const handleCancelEditing = () => {
@@ -67,7 +72,7 @@ function Dashboard() {
     const handleSaveEdit = async (noteId) => {
         try {
             const tags = editTags.split(',').map(tag => tag.trim()).filter(Boolean);
-            const res = await updateNote(noteId, { title: editTitle, content: editContent, tags });
+            const res = await updateNote(noteId, { title: editTitle, content: editContent, tags, color: editColor });
             setNotes(notes.map(n => (n._id === noteId ? res.data : n)));
             handleCancelEditing();
         } catch (error) {
@@ -113,6 +118,27 @@ function Dashboard() {
         setActiveSection("notes");
     };
 
+    const loadArchivedNotes = async () => {
+        try {
+            const res = await fetchArchivedNotes();
+            setArchivedNotes(res.data);
+        } catch (error) {
+            alert('Failed to fetch archived notes');
+        }
+    };
+
+    const handleArchiveNote = async (noteId) => {
+        await archiveNote(noteId);
+        setNotes(notes => notes.filter(n => n._id !== noteId));
+        loadArchivedNotes();
+    };
+
+    const handleUnarchiveNote = async (noteId) => {
+        await unarchiveNote(noteId);
+        loadArchivedNotes();
+        fetchNotesList();
+    };
+
     const filteredNotes = [...notes]
         .filter(note =>
             (!selectedTag || (note.tags && note.tags.includes(selectedTag))) &&
@@ -131,7 +157,11 @@ function Dashboard() {
     useEffect(() => {
         if (activeSection === "trash") {
             loadTrashedNotes();
-        } else if (activeSection === "notes") {
+        }
+        else if (activeSection === "archive") {
+            loadArchivedNotes();
+        } 
+        else if (activeSection === "notes") {
             fetchNotesList();
         }
         // eslint-disable-next-line
@@ -189,6 +219,9 @@ function Dashboard() {
                                         onSaveEdit={handleSaveEdit}
                                         onTrashNote={handleTrashNote}
                                         onPinToggle={handlePinToggle}
+                                        onArchiveNote={handleArchiveNote}
+                                        editColor={editColor}
+                                        setEditColor={setEditColor}
                                     />
                                 </>
                             )}
@@ -202,11 +235,11 @@ function Dashboard() {
                             )}
                             
                             {activeSection === "archive" && (
-                                <div className="flex flex-col items-center justify-center h-96 text-center">
-                                    <div className="text-6xl mb-4">📦</div>
-                                    <h3 className="text-2xl font-semibold text-gray-700 mb-2">Archive Coming Soon!</h3>
-                                    <p className="text-gray-500">This feature is under development.</p>
-                                </div>
+                                <NotesList
+                                    notes={archivedNotes}
+                                    onUnarchiveNote={handleUnarchiveNote}
+                                    // Pass other props as needed
+                                />
                             )}
                         </div>
                     </div>

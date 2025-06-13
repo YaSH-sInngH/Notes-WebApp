@@ -66,79 +66,102 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
-      {/* LEFT SIDE with enhanced animations */}
-      <div className="w-1/2 bg-gradient-to-br from-indigo-900 via-blue-800 to-purple-900 text-white flex items-center justify-center relative overflow-hidden">
-        {/* Background animated elements */}
+    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* LEFT SIDE - Modern Notes Design */}
+      <div className="w-1/2 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-700 text-white flex items-center justify-center relative overflow-hidden">
+        {/* Subtle background pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-32 h-32 bg-yellow-400 rounded-full animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-24 h-24 bg-blue-400 rounded-full animate-bounce"></div>
-          <div className="absolute top-1/2 left-10 w-16 h-16 bg-purple-400 rounded-full animate-ping"></div>
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E")`,
+          }}></div>
         </div>
-        
-        {/* Floating notes icons */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 animate-float">
-            <svg className="w-8 h-8 text-yellow-300 opacity-20" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
-              <path fillRule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd"></path>
-            </svg>
+
+        {/* Floating notes animation */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Note 1 */}
+          <div className="absolute top-20 left-16 animate-float">
+            <div className="bg-yellow-200 bg-opacity-20 backdrop-blur-sm rounded-lg p-3 w-24 h-20 shadow-lg border border-white border-opacity-20">
+              <div className="w-full h-2 bg-white bg-opacity-30 rounded mb-1"></div>
+              <div className="w-3/4 h-2 bg-white bg-opacity-20 rounded mb-1"></div>
+              <div className="w-1/2 h-2 bg-white bg-opacity-20 rounded"></div>
+            </div>
           </div>
-          <div className="absolute bottom-1/3 right-1/3 animate-float-delayed">
-            <svg className="w-6 h-6 text-blue-300 opacity-20" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd"></path>
-            </svg>
+          
+          {/* Note 2 */}
+          <div className="absolute top-32 right-20 animate-float-delayed">
+            <div className="bg-blue-200 bg-opacity-20 backdrop-blur-sm rounded-lg p-3 w-20 h-16 shadow-lg border border-white border-opacity-20">
+              <div className="w-full h-1.5 bg-white bg-opacity-30 rounded mb-1"></div>
+              <div className="w-2/3 h-1.5 bg-white bg-opacity-20 rounded mb-1"></div>
+              <div className="w-3/4 h-1.5 bg-white bg-opacity-20 rounded"></div>
+            </div>
+          </div>
+          
+          {/* Note 3 */}
+          <div className="absolute bottom-32 left-20 animate-float-slow">
+            <div className="bg-green-200 bg-opacity-20 backdrop-blur-sm rounded-lg p-3 w-28 h-22 shadow-lg border border-white border-opacity-20">
+              <div className="w-full h-2 bg-white bg-opacity-30 rounded mb-1"></div>
+              <div className="w-4/5 h-2 bg-white bg-opacity-20 rounded mb-1"></div>
+              <div className="w-2/3 h-2 bg-white bg-opacity-20 rounded"></div>
+            </div>
+          </div>
+          
+          {/* Note 4 */}
+          <div className="absolute bottom-20 right-16 animate-float-reverse">
+            <div className="bg-purple-200 bg-opacity-20 backdrop-blur-sm rounded-lg p-3 w-22 h-18 shadow-lg border border-white border-opacity-20">
+              <div className="w-full h-1.5 bg-white bg-opacity-30 rounded mb-1"></div>
+              <div className="w-3/4 h-1.5 bg-white bg-opacity-20 rounded mb-1"></div>
+              <div className="w-1/2 h-1.5 bg-white bg-opacity-20 rounded"></div>
+            </div>
           </div>
         </div>
 
-        <div className="text-center px-8 z-10 relative">
+        <div className="text-center px-12 z-10 relative max-w-lg">
+          {/* Modern Logo */}
           <div className="mb-8">
-            <div className="w-20 h-20 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full mx-auto mb-6 flex items-center justify-center shadow-2xl">
-              <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
-                <path fillRule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd"></path>
-              </svg>
+            <div className="relative">
+              <div className="w-24 h-24 bg-white bg-opacity-10 backdrop-blur-md rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-2xl border border-white border-opacity-20">
+                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </div>
+              {/* Subtle glow effect */}
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 bg-white bg-opacity-5 rounded-2xl blur-xl"></div>
             </div>
           </div>
           
-          <h1 className="text-6xl font-extrabold mb-8 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent leading-tight">
-            {typedText}
-            <span className="animate-pulse">|</span>
+          {/* Main heading with typing effect */}
+          <h1 className="text-5xl font-bold mb-6 leading-tight">
+            <span className="block text-white mb-2">Notes</span>
+            <span className="block bg-gradient-to-r from-yellow-300 via-orange-300 to-pink-300 bg-clip-text text-transparent">
+              {typedText}
+              <span className="animate-pulse text-white">|</span>
+            </span>
           </h1>
           
-          <div className="space-y-4">
-            <p className="text-2xl font-bold text-yellow-300 font-serif">
-              Manage your notes easily and securely.
-            </p>
-            <p className="text-lg text-blue-200 opacity-90">
-              Your thoughts, organized and protected
-            </p>
-          </div>
+          {/* Subtitle */}
+          <p className="text-xl text-blue-100 mb-8 font-light leading-relaxed">
+            Capture thoughts, organize ideas, and never lose track of what matters most
+          </p>
           
-          <div className="mt-12 flex justify-center space-x-4">
-            <div className="flex items-center space-x-2 text-green-300">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
-              </svg>
-              <span>Secure</span>
+          {/* Feature highlights */}
+          <div className="grid grid-cols-1 gap-4 max-w-sm mx-auto">
+            <div className="flex items-center justify-center space-x-3 bg-white bg-opacity-10 backdrop-blur-sm rounded-full py-3 px-6 border border-white border-opacity-20">
+              <div className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-green-100">Sync Across Devices</span>
             </div>
-            <div className="flex items-center space-x-2 text-green-300">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
-              </svg>
-              <span>Fast</span>
+            <div className="flex items-center justify-center space-x-3 bg-white bg-opacity-10 backdrop-blur-sm rounded-full py-3 px-6 border border-white border-opacity-20">
+              <div className="w-2 h-2 bg-blue-300 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-blue-100">Rich Text Editor</span>
             </div>
-            <div className="flex items-center space-x-2 text-green-300">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
-              </svg>
-              <span>Easy</span>
+            <div className="flex items-center justify-center space-x-3 bg-white bg-opacity-10 backdrop-blur-sm rounded-full py-3 px-6 border border-white border-opacity-20">
+              <div className="w-2 h-2 bg-purple-300 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-purple-100">Secure & Private</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* RIGHT SIDE - Enhanced Login/Register Form */}
+      {/* RIGHT SIDE - Keep existing login/register design */}
       <div className="w-1/2 bg-white flex items-center justify-center relative overflow-hidden">
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-5">
@@ -329,23 +352,41 @@ export default function Home() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-12px) rotate(1deg); }
         }
         
         @keyframes float-delayed {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-15px); }
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-15px) rotate(-1deg); }
+        }
+        
+        @keyframes float-slow {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-8px) rotate(0.5deg); }
+        }
+        
+        @keyframes float-reverse {
+          0%, 100% { transform: translateY(-5px) rotate(0deg); }
+          50% { transform: translateY(8px) rotate(-0.5deg); }
         }
         
         .animate-float {
-          animation: float 3s ease-in-out infinite;
+          animation: float 4s ease-in-out infinite;
         }
         
         .animate-float-delayed {
-          animation: float-delayed 4s ease-in-out infinite 1s;
+          animation: float-delayed 5s ease-in-out infinite 0.5s;
+        }
+        
+        .animate-float-slow {
+          animation: float-slow 6s ease-in-out infinite 1s;
+        }
+        
+        .animate-float-reverse {
+          animation: float-reverse 4.5s ease-in-out infinite 1.5s;
         }
       `}</style>
     </div>

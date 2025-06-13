@@ -1,5 +1,16 @@
 import express from "express";
-import { createNote, getNotes, updateNote, deleteNote, trashNote, restoreNote, getTrashedNotes } from "../controllers/noteController.js";
+import { 
+    createNote, 
+    getNotes, 
+    updateNote,
+    deleteNote, 
+    trashNote, 
+    restoreNote, 
+    getTrashedNotes, 
+    archiveNote, 
+    unarchiveNote, 
+    getArchivedNotes 
+} from "../controllers/noteController.js";
 import verifyToken from "../middlewares/auth.js";
 
 const router = express.Router();
@@ -12,5 +23,9 @@ router.delete("/:id", verifyToken, deleteNote);
 router.put("/trash/:id", verifyToken, trashNote);
 router.put("/restore/:id", verifyToken, restoreNote);
 router.get("/trashed", verifyToken, getTrashedNotes);
+
+router.put("/archive/:id", verifyToken, archiveNote);
+router.put("/unarchive/:id", verifyToken, unarchiveNote);
+router.get("/archived", verifyToken, getArchivedNotes);
 
 export default router;

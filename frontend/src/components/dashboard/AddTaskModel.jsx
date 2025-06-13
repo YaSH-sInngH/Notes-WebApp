@@ -1,11 +1,27 @@
 import { useRef, useState } from "react";
 
+const PRESET_COLORS = [
+    "#f44336", // red
+    "#ff9800", // orange
+    "#ffeb3b", // yellow
+    "#8bc34a", // light green
+    "#4caf50", // green
+    "#009688", // teal
+    "#2196f3", // blue
+    "#3f51b5", // indigo
+    "#673ab7", // deep purple
+    "#9c27b0", // purple
+    "#e040fb", // violet
+    "#ff4081", // pink
+];
+
 function AddTaskModal({ onClose, onAddNote }) {
     const formRef = useRef();
     const [formData, setFormData] = useState({
         title: '',
         content: '',
-        tags: ''
+        tags: '',
+        color: '#ffffff', // Default color
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -24,6 +40,7 @@ function AddTaskModal({ onClose, onAddNote }) {
                 title: formData.title,
                 content: formData.content,
                 tags: formData.tags,
+                color: formData.color,
             });
             onClose();
         } catch (error) {
@@ -142,6 +159,30 @@ function AddTaskModal({ onClose, onAddNote }) {
                                 </p>
                             </div>
 
+                            <div className="space-y-2 mt-4">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    Note Color
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                    {PRESET_COLORS.map((color) => (
+                                        <button
+                                            key={color}
+                                            type="button"
+                                            className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-150
+                                                ${formData.color === color ? "border-black scale-110" : "border-gray-200"}
+                                            `}
+                                            style={{ backgroundColor: color }}
+                                            onClick={() => setFormData(prev => ({ ...prev, color }))}
+                                            aria-label={`Pick color ${color}`}
+                                        >
+                                            {formData.color === color && (
+                                                <span className="text-white text-lg font-bold">✓</span>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
                             {/* Action Buttons */}
                             <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-100">
                                 <button
@@ -180,7 +221,7 @@ function AddTaskModal({ onClose, onAddNote }) {
                 </div>
             </div>
 
-            <style jsx>{`
+            <style>{`
                 @keyframes fadeIn {
                     from {
                         opacity: 0;

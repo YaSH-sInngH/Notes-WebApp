@@ -104,3 +104,43 @@ export const getTrashedNotes = async (req, res) => {
         res.status(500).json({ message: "Error while fetching trashed notes" });
     }
 }
+
+export const archiveNote = async (req, res) => {
+    try {
+        const note = await Note.findOneAndUpdate(
+            { _id: req.params.id, user: req.user.id },
+            { isArchived: true },
+            { new: true }
+        );
+        if (!note) return res.status(404).json({ message: "Note not found" });
+        res.status(200).json(note);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error while archiving note" });
+    }
+};
+
+export const unarchiveNote = async (req, res) => {
+    try {
+        const note = await Note.findOneAndUpdate(
+            { _id: req.params.id, user: req.user.id },
+            { isArchived: false },
+            { new: true }
+        );
+        if (!note) return res.status(404).json({ message: "Note not found" });
+        res.status(200).json(note);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error while unarchiving note" });
+    }
+};
+
+export const getArchivedNotes = async (req, res) => {
+    try {
+        const notes = await Note.find({ user: req.user.id, isArchived: true, isTrashed: false });
+        res.status(200).json(notes);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error while fetching archived notes" });
+    }
+}

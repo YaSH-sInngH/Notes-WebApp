@@ -23,3 +23,7 @@ export const deleteNote = (id) => API.delete(`/notes/${id}`);
 export const trashNote = (id) => API.put(`/notes/trash/${id}`);
 export const restoreNote = (id) => API.put(`/notes/restore/${id}`);
 export const fetchTrashedNotes = () => API.get("/notes/trashed");
+
+export const archiveNote = (id) => API.put(`/notes/archive/${id}`);
+export const unarchiveNote = (id) => API.put(`/notes/unarchive/${id}`);
+export const fetchArchivedNotes = () => API.get("/notes/archived");
