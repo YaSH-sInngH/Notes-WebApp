@@ -1,18 +1,9 @@
 import { useRef, useState } from "react";
 
 const PRESET_COLORS = [
-    "#f44336", // red
-    "#ff9800", // orange
-    "#ffeb3b", // yellow
-    "#8bc34a", // light green
-    "#4caf50", // green
-    "#009688", // teal
-    "#2196f3", // blue
-    "#3f51b5", // indigo
-    "#673ab7", // deep purple
-    "#9c27b0", // purple
-    "#e040fb", // violet
-    "#ff4081", // pink
+    "#f44336", "#ff9800", "#ffeb3b", "#8bc34a", "#4caf50",
+    "#009688", "#2196f3", "#3f51b5", "#673ab7", "#9c27b0",
+    "#e040fb", "#ff4081",
 ];
 
 function AddTaskModal({ onClose, onAddNote }) {
@@ -21,7 +12,7 @@ function AddTaskModal({ onClose, onAddNote }) {
         title: '',
         content: '',
         tags: '',
-        color: '#ffffff', // Default color
+        color: '#ffffff',
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -52,30 +43,26 @@ function AddTaskModal({ onClose, onAddNote }) {
 
     return (
         <>
-            {/* Enhanced backdrop with blur effect */}
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fadeIn">
-                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 relative transform transition-all duration-300">
-                    {/* Header section with gradient */}
-                    <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-2xl p-6 relative overflow-hidden">
-                        {/* Background pattern */}
+                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg sm:max-w-2xl mx-2 sm:mx-4 relative transform transition-all duration-300">
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-2xl p-4 sm:p-6 relative overflow-hidden">
                         <div className="absolute inset-0 opacity-10">
-                            <div className="absolute top-2 right-8 w-16 h-16 bg-white rounded-full"></div>
-                            <div className="absolute bottom-2 left-8 w-12 h-12 bg-white rounded-full"></div>
+                            <div className="absolute top-2 right-8 w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full"></div>
+                            <div className="absolute bottom-2 left-8 w-8 h-8 sm:w-12 sm:h-12 bg-white rounded-full"></div>
                         </div>
-                        
                         <div className="relative z-10 flex items-center justify-between">
                             <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                                     </svg>
                                 </div>
                                 <div>
-                                    <h2 className="text-2xl font-bold text-white">Add New Task</h2>
-                                    <p className="text-blue-100 text-sm">Create a new task to organize your work</p>
+                                    <h2 className="text-lg sm:text-2xl font-bold text-white">Add New Task</h2>
+                                    <p className="text-blue-100 text-xs sm:text-sm">Create a new task to organize your work</p>
                                 </div>
                             </div>
-                            
                             <button
                                 onClick={onClose}
                                 className="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white hover:text-gray-200 transition-all duration-200 transform hover:scale-110"
@@ -89,7 +76,7 @@ function AddTaskModal({ onClose, onAddNote }) {
                     </div>
 
                     {/* Form section */}
-                    <div className="p-8">
+                    <div className="p-4 sm:p-8">
                         <div ref={formRef} className="space-y-6">
                             {/* Title Input */}
                             <div className="space-y-2">
@@ -107,7 +94,7 @@ function AddTaskModal({ onClose, onAddNote }) {
                                         value={formData.title}
                                         onChange={handleInputChange}
                                         placeholder="Enter your task title..."
-                                        className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white text-gray-800 placeholder-gray-500"
+                                        className="w-full pl-12 pr-4 py-3 sm:py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white text-gray-800 placeholder-gray-500"
                                         required
                                     />
                                 </div>
@@ -129,7 +116,7 @@ function AddTaskModal({ onClose, onAddNote }) {
                                         value={formData.content}
                                         onChange={handleInputChange}
                                         placeholder="Describe your task in detail..."
-                                        className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white text-gray-800 placeholder-gray-500 resize-vertical min-h-[120px]"
+                                        className="w-full pl-12 pr-4 py-3 sm:py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white text-gray-800 placeholder-gray-500 resize-vertical min-h-[100px] sm:min-h-[120px]"
                                         rows={4}
                                     />
                                 </div>
@@ -151,7 +138,7 @@ function AddTaskModal({ onClose, onAddNote }) {
                                         value={formData.tags}
                                         onChange={handleInputChange}
                                         placeholder="work, important, deadline (comma separated)"
-                                        className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white text-gray-800 placeholder-gray-500"
+                                        className="w-full pl-12 pr-4 py-3 sm:py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white text-gray-800 placeholder-gray-500"
                                     />
                                 </div>
                                 <p className="text-xs text-gray-500 mt-1">
@@ -159,6 +146,7 @@ function AddTaskModal({ onClose, onAddNote }) {
                                 </p>
                             </div>
 
+                            {/* Color Picker */}
                             <div className="space-y-2 mt-4">
                                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                                     Note Color
@@ -168,7 +156,7 @@ function AddTaskModal({ onClose, onAddNote }) {
                                         <button
                                             key={color}
                                             type="button"
-                                            className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-150
+                                            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 flex items-center justify-center transition-all duration-150
                                                 ${formData.color === color ? "border-black scale-110" : "border-gray-200"}
                                             `}
                                             style={{ backgroundColor: color }}
@@ -184,11 +172,11 @@ function AddTaskModal({ onClose, onAddNote }) {
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-100">
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 pt-6 border-t border-gray-100">
                                 <button
                                     type="button"
                                     onClick={onClose}
-                                    className="px-6 py-3 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105"
+                                    className="w-full sm:w-auto px-6 py-3 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105"
                                 >
                                     Cancel
                                 </button>
@@ -196,7 +184,7 @@ function AddTaskModal({ onClose, onAddNote }) {
                                     type="button"
                                     onClick={handleSubmit}
                                     disabled={isSubmitting || !formData.title.trim()}
-                                    className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center space-x-2"
+                                    className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
                                 >
                                     {isSubmitting ? (
                                         <>
@@ -232,7 +220,6 @@ function AddTaskModal({ onClose, onAddNote }) {
                         transform: scale(1) translateY(0);
                     }
                 }
-                
                 .animate-fadeIn {
                     animation: fadeIn 0.3s ease-out forwards;
                 }

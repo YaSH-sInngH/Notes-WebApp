@@ -7,7 +7,6 @@ import NotesList from './NotesList';
 import TrashList from './TrashList';
 import AddTaskModal from './AddTaskModel';
 
-
 function Dashboard() {
     const [notes, setNotes] = useState([]);
     const [archivedNotes, setArchivedNotes] = useState([]);
@@ -23,6 +22,7 @@ function Dashboard() {
     const [showAddTaskModal, setShowAddTaskModal] = useState(false);
     const [sortBy, setSortBy] = useState('createdAt');
     const [editColor, setEditColor] = useState('#ffffff'); // Default color
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const allTags = Array.from(new Set(notes.flatMap(note => note.tags || [])));
 
@@ -40,19 +40,19 @@ function Dashboard() {
     };
 
     const handleAddNote = async ({ title, content, tags, color }) => {
-    try {
-        const newNote = {
-            title,
-            content,
-            tags: tags.split(',').map(tag => tag.trim()).filter(Boolean),
-            color
-        };
-        const res = await createNote(newNote);
-        setNotes(prev => [res.data, ...prev]);
-    } catch (error) {
-        console.error('Error adding note:', error);
-    }
-};
+        try {
+            const newNote = {
+                title,
+                content,
+                tags: tags.split(',').map(tag => tag.trim()).filter(Boolean),
+                color
+            };
+            const res = await createNote(newNote);
+            setNotes(prev => [res.data, ...prev]);
+        } catch (error) {
+            console.error('Error adding note:', error);
+        }
+    };
 
     const handleStartEditing = (note) => {
         setEditingNoteId(note._id);
@@ -169,19 +169,33 @@ function Dashboard() {
 
     return (
         <div className="flex h-screen bg-gradient-to-br from-slate-50 to-blue-50 overflow-hidden">
-            {/* Fixed Sidebar */}
-            <div className="fixed left-0 top-0 h-full z-40">
+            {/* Sidebar: overlay on mobile, fixed on desktop */}
+            {/* Overlay for mobile */}
+            {sidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/40 z-40 md:hidden"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            )}
+            {/* Sidebar itself */}
+            <div className={`
+                fixed left-0 top-0 h-full z-50 transition-transform duration-300
+                ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                md:translate-x-0 md:fixed md:block
+            `}>
                 <Sidebar
                     activeSection={activeSection}
                     setActiveSection={setActiveSection}
                     allTags={allTags}
                     onTagClick={handleTagClick}
                     setSelectedTag={setSelectedTag}
+                    selectedTag={selectedTag}
+                    onClose={() => setSidebarOpen(false)} // Pass close handler
                 />
             </div>
-            
+
             {/* Main Content Area */}
-            <div className="flex-1 ml-80 flex flex-col h-full">
+            <div className="flex-1 md:ml-80 flex flex-col h-full">
                 {/* Header */}
                 <div className="flex-shrink-0 bg-white/80 backdrop-blur-sm border-b border-gray-200/50 shadow-sm">
                     <div className="px-8 py-6">
@@ -253,6 +267,17 @@ function Dashboard() {
                 aria-label='Add Task'
             >
                 <span className="text-3xl font-light">+</span>
+            </button>
+
+            {/* Hamburger Button for Mobile */}
+            <button
+                className="md:hidden fixed top-4 left-4 z-50 bg-white rounded-full p-2 shadow-lg"
+                onClick={() => setSidebarOpen(true)}
+                aria-label="Open sidebar"
+            >
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
             </button>
             
             {/* Modal */}

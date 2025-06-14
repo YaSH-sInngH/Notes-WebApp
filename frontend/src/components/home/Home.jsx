@@ -68,7 +68,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* LEFT SIDE - Modern Notes Design */}
-      <div className="w-1/2 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-700 text-white flex items-center justify-center relative overflow-hidden">
+      <div className="hidden md:flex w-full md:w-1/2 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-700 text-white items-center justify-center relative overflow-hidden min-h-[320px]">
         {/* Subtle background pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
@@ -162,7 +162,7 @@ export default function Home() {
       </div>
 
       {/* RIGHT SIDE - Keep existing login/register design */}
-      <div className="w-1/2 bg-white flex items-center justify-center relative overflow-hidden">
+      <div className="w-full md:w-1/2 bg-white flex items-center justify-center relative overflow-hidden min-h-[320px]">
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute inset-0" style={{

@@ -1,6 +1,17 @@
-function Sidebar({ activeSection, setActiveSection, allTags, onTagClick, setSelectedTag, selectedTag }) {
+function Sidebar({ activeSection, setActiveSection, allTags, onTagClick, setSelectedTag, selectedTag, onClose }) {
     return (
-        <aside className="h-screen bg-gradient-to-b from-slate-900 via-blue-900 to-slate-900 text-white flex flex-col py-8 px-6 w-80 shadow-2xl border-r border-blue-800/30">
+        <aside className="h-screen bg-gradient-to-b from-slate-900 via-blue-900 to-slate-900 text-white flex flex-col py-8 px-6 w-72 md:w-80 shadow-2xl border-r border-blue-800/30 relative">
+            {/* Close button for mobile */}
+            {typeof onClose === 'function' && (
+                <button
+                    className="md:hidden absolute top-4 right-4 text-white text-2xl"
+                    onClick={onClose}
+                    aria-label="Close sidebar"
+                >
+                    &times;
+                </button>
+            )}
+
             {/* Top: Logo, Navigation, Categories */}
             <div className="flex-1 flex flex-col">
                 <div className="mb-12">
@@ -155,9 +166,8 @@ function Sidebar({ activeSection, setActiveSection, allTags, onTagClick, setSele
                         localStorage.removeItem("token");
                         window.location.href = "/";
                     }}
-                    className="group w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
+                    className="group w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
                 >
-                    <span className="text-lg group-hover:rotate-12 transition-transform duration-300">🚪</span>
                     <span>Logout</span>
                 </button>
             </div>
