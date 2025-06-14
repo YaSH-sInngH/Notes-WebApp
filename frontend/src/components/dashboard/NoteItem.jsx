@@ -1,4 +1,5 @@
 import React from "react";
+import ReactMarkdown from "react-markdown"; // <-- Add this import
 
 const PRESET_COLORS = [
     "#f44336", "#ff9800", "#ffeb3b", "#8bc34a", "#4caf50",
@@ -44,6 +45,7 @@ function NoteItem({
                         onChange={e => setEditContent(e.target.value)}
                         className="border px-2 sm:px-3 py-2 w-full mb-2 sm:mb-3 rounded shadow-sm text-sm sm:text-base"
                     />
+                    <div className="text-xs text-gray-400 mb-2">Supports <a href="https://commonmark.org/help/" target="_blank" rel="noopener noreferrer" className="underline">Markdown</a></div>
                     <input
                         value={editTags}
                         onChange={e => setEditTags(e.target.value)}
@@ -95,7 +97,10 @@ function NoteItem({
                             {note.title} {note.pinned && <span className="text-blue-500">📌</span>}
                         </h3>
                     </div>
-                    <p className="text-gray-700 mb-2 sm:mb-3 text-xs sm:text-sm">{note.content}</p>
+                    {/* Markdown rendering here */}
+                    <div className="prose prose-sm sm:prose-base max-w-none text-gray-700 mb-2 sm:mb-3">
+                        <ReactMarkdown>{note.content}</ReactMarkdown>
+                    </div>
                     {note.tags?.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-2 sm:mb-3">
                             {note.tags.map(tag => (
