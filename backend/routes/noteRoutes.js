@@ -9,7 +9,8 @@ import {
     getTrashedNotes, 
     archiveNote, 
     unarchiveNote, 
-    getArchivedNotes 
+    getArchivedNotes,
+    getSharedNote
 } from "../controllers/noteController.js";
 import verifyToken from "../middlewares/auth.js";
 
@@ -27,5 +28,7 @@ router.get("/trashed", verifyToken, getTrashedNotes);
 router.put("/archive/:id", verifyToken, archiveNote);
 router.put("/unarchive/:id", verifyToken, unarchiveNote);
 router.get("/archived", verifyToken, getArchivedNotes);
+
+router.get("/shared/:id", getSharedNote);
 
 export default router;

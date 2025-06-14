@@ -144,3 +144,24 @@ export const getArchivedNotes = async (req, res) => {
         res.status(500).json({ message: "Error while fetching archived notes" });
     }
 }
+
+export const getSharedNote = async (req, res) => {
+    try {
+        const note = await Note.findById(req.params.id);
+        if (!note || note.isTrashed) {
+            return res.status(404).json({ message: "Note not found" });
+        }
+        // Only return public fields
+        res.status(200).json({
+            title: note.title,
+            content: note.content,
+            tags: note.tags,
+            color: note.color,
+            createdAt: note.createdAt,
+            updatedAt: note.updatedAt,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error while fetching shared note" });
+    }
+};

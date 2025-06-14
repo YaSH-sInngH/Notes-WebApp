@@ -27,3 +27,5 @@ export const fetchTrashedNotes = () => API.get("/notes/trashed");
 export const archiveNote = (id) => API.put(`/notes/archive/${id}`);
 export const unarchiveNote = (id) => API.put(`/notes/unarchive/${id}`);
 export const fetchArchivedNotes = () => API.get("/notes/archived");
+
+export const fetchSharedNote = (id) => API.get(`/notes/shared/${id}`);

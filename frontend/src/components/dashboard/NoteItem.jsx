@@ -1,5 +1,5 @@
 import React from "react";
-import ReactMarkdown from "react-markdown"; // <-- Add this import
+import ReactMarkdown from "react-markdown";
 
 const PRESET_COLORS = [
     "#f44336", "#ff9800", "#ffeb3b", "#8bc34a", "#4caf50",
@@ -28,11 +28,29 @@ function NoteItem({
     editColor
 }) {
     const isEditing = editingNoteId === note._id;
+
     return (
         <li
-            className={`border rounded-lg shadow-md transition duration-200 bg-white w-full max-w-md sm:max-w-sm md:max-w-md mx-auto mb-4 p-2 sm:p-4`}
+            className="relative border rounded-lg shadow-md transition duration-200 bg-white w-full max-w-md sm:max-w-sm md:max-w-md mx-auto mb-4 p-2 sm:p-4"
             style={{ backgroundColor: note.color || "#fff", borderColor: note.pinned ? "#60a5fa" : "#e5e7eb" }}
         >
+            {/* Share Icon - only show when not editing */}
+            {!isEditing && (
+                <button
+                    className="absolute top-2 right-2 z-10 bg-white rounded-full p-2 shadow hover:bg-blue-100 transition"
+                    title="Copy share link"
+                    onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/share/${note._id}`);
+                        // You can use a toast/snackbar here instead of alert for better UX
+                        alert("Shareable link copied!");
+                    }}
+                >
+                    {/* Paper plane SVG icon (from your image) */}
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" stroke="currentColor" strokeWidth="2" fill="none" />
+                    </svg>
+                </button>
+            )}
             {isEditing ? (
                 <>
                     <input
