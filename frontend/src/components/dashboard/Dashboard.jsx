@@ -270,15 +270,17 @@ function Dashboard() {
             </button>
 
             {/* Hamburger Button for Mobile */}
-            <button
-                className="md:hidden fixed top-4 left-4 z-50 bg-white rounded-full p-2 shadow-lg"
-                onClick={() => setSidebarOpen(true)}
-                aria-label="Open sidebar"
-            >
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
+            {!sidebarOpen && (
+                <button
+                    className="md:hidden fixed top-4 left-4 z-50 bg-white rounded-full p-2 shadow-lg"
+                    onClick={() => setSidebarOpen(true)}
+                    aria-label="Open sidebar"
+                >
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            )}
             
             {/* Modal */}
             {showAddTaskModal && (
