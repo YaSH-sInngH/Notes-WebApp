@@ -6,6 +6,7 @@ import SearchBar from './SearchBar';
 import NotesList from './NotesList';
 import TrashList from './TrashList';
 import AddTaskModal from './AddTaskModel';
+import { toast } from 'react-toastify';
 
 function Dashboard() {
     const [notes, setNotes] = useState([]);
@@ -21,8 +22,11 @@ function Dashboard() {
     const [activeSection, setActiveSection] = useState('notes');
     const [showAddTaskModal, setShowAddTaskModal] = useState(false);
     const [sortBy, setSortBy] = useState('createdAt');
-    const [editColor, setEditColor] = useState('#ffffff'); // Default color
+    const [editColor, setEditColor] = useState('#ffffff');
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [statusFilter, setStatusFilter] = useState('');
+    const [editStatus, setEditStatus] = useState('Pending');
+    const [editDueDate, setEditDueDate] = useState("");
 
     const allTags = Array.from(new Set(notes.flatMap(note => note.tags || [])));
 
@@ -35,22 +39,25 @@ function Dashboard() {
             const res = await fetchNotes();
             setNotes(res.data);
         } catch (error) {
-            alert('Error: ' + (error.response?.data?.message || error.message));
+            toast.error('Error: ' + (error.response?.data?.message || error.message));
         }
     };
 
-    const handleAddNote = async ({ title, content, tags, color }) => {
+    const handleAddNote = async ({ title, content, tags, color, status, dueDate }) => {
         try {
             const newNote = {
                 title,
                 content,
                 tags: tags.split(',').map(tag => tag.trim()).filter(Boolean),
-                color
+                color,
+                status,
+                dueDate: dueDate || null
             };
             const res = await createNote(newNote);
             setNotes(prev => [res.data, ...prev]);
         } catch (error) {
             console.error('Error adding note:', error);
+            toast.error('Failed to add note');
         }
     };
 
@@ -59,7 +66,9 @@ function Dashboard() {
         setEditTitle(note.title);
         setEditContent(note.content);
         setEditTags(note.tags ? note.tags.join(', ') : '');
-        setEditColor(note.color || '#ffffff'); // Set color if available
+        setEditColor(note.color || '#ffffff');
+        setEditStatus(note.status || 'Pending');
+        setEditDueDate(note.dueDate ? new Date(note.dueDate).toISOString().split('T')[0] : '');
     };
 
     const handleCancelEditing = () => {
@@ -67,22 +76,50 @@ function Dashboard() {
         setEditTitle('');
         setEditContent('');
         setEditTags('');
+        setEditColor('#ffffff');
+        setEditStatus('Pending');
+        setEditDueDate('');
     };
 
-    const handleSaveEdit = async (noteId) => {
+    const handleSaveEdit = async (noteId, field, value) => {
         try {
-            const tags = editTags.split(',').map(tag => tag.trim()).filter(Boolean);
-            const res = await updateNote(noteId, { title: editTitle, content: editContent, tags, color: editColor });
+            let updatedNote = notes.find(note => note._id === noteId);
+
+            if (!updatedNote) return;
+
+            if (field) {
+                // Update a single field (e.g., status, pinned, etc.)
+                updatedNote = { ...updatedNote, [field]: value };
+            } else {
+                // Full edit (from editing UI)
+                updatedNote = {
+                    ...updatedNote,
+                    title: editTitle,
+                    content: editContent,
+                    tags: editTags.split(',').map(tag => tag.trim()).filter(Boolean),
+                    color: editColor,
+                    status: editStatus,
+                    dueDate: editDueDate || null
+                };
+            }
+            const res = await updateNote(noteId, updatedNote);
             setNotes(notes.map(n => (n._id === noteId ? res.data : n)));
-            handleCancelEditing();
+            if (!field) {
+                handleCancelEditing();
+            }
         } catch (error) {
-            alert('Failed to update note');
+            toast.error('Failed to update note');
         }
     };
 
     const handleTrashNote = async (noteId) => {
-        await trashNote(noteId);
-        setNotes(notes.filter(n => n._id !== noteId));
+        try {
+            await trashNote(noteId);
+            setNotes(notes.filter(n => n._id !== noteId));
+            toast.success('Note moved to trash');
+        } catch (error) {
+            toast.error('Failed to trash note');
+        }
     };
 
     const handlePinToggle = async (note) => {
@@ -90,7 +127,7 @@ function Dashboard() {
             const res = await updateNote(note._id, { pinned: !note.pinned });
             setNotes(notes.map(n => (n._id === note._id ? res.data : n)));
         } catch (error) {
-            alert('Failed to pin/unpin note');
+            toast.error('Failed to pin/unpin note');
         }
     };
 
@@ -99,18 +136,28 @@ function Dashboard() {
             const res = await fetchTrashedNotes();
             setTrashedNotes(res.data);
         } catch (error) {
-            alert('Failed to fetch trashed notes');
+            toast.error('Failed to fetch trashed notes');
         }
     };
 
     const handleRestore = async (noteId) => {
-        await restoreNote(noteId);
-        setTrashedNotes(trashedNotes.filter(n => n._id !== noteId));
+        try {
+            await restoreNote(noteId);
+            setTrashedNotes(trashedNotes.filter(n => n._id !== noteId));
+            toast.success('Note restored');
+        } catch (error) {
+            toast.error('Failed to restore note');
+        }
     };
 
     const handleDeletePermanently = async (noteId) => {
-        await deleteNote(noteId);
-        await loadTrashedNotes();
+        try {
+            await deleteNote(noteId);
+            await loadTrashedNotes();
+            toast.success('Note permanently deleted');
+        } catch (error) {
+            toast.error('Failed to delete note');
+        }
     };
 
     const handleTagClick = (tag) => {
@@ -123,25 +170,36 @@ function Dashboard() {
             const res = await fetchArchivedNotes();
             setArchivedNotes(res.data);
         } catch (error) {
-            alert('Failed to fetch archived notes');
+            toast.error('Failed to fetch archived notes');
         }
     };
 
     const handleArchiveNote = async (noteId) => {
-        await archiveNote(noteId);
-        setNotes(notes => notes.filter(n => n._id !== noteId));
-        loadArchivedNotes();
+        try {
+            await archiveNote(noteId);
+            setNotes(notes => notes.filter(n => n._id !== noteId));
+            loadArchivedNotes();
+            toast.success('Note archived');
+        } catch (error) {
+            toast.error('Failed to archive note');
+        }
     };
 
     const handleUnarchiveNote = async (noteId) => {
-        await unarchiveNote(noteId);
-        loadArchivedNotes();
-        fetchNotesList();
+        try {
+            await unarchiveNote(noteId);
+            loadArchivedNotes();
+            fetchNotesList();
+            toast.success('Note unarchived');
+        } catch (error) {
+            toast.error('Failed to unarchive note');
+        }
     };
 
     const filteredNotes = [...notes]
         .filter(note =>
             (!selectedTag || (note.tags && note.tags.includes(selectedTag))) &&
+            (!statusFilter || note.status === statusFilter) &&
             (
                 note.title.toLowerCase().includes(search.toLowerCase()) ||
                 note.content.toLowerCase().includes(search.toLowerCase())
@@ -190,7 +248,7 @@ function Dashboard() {
                     onTagClick={handleTagClick}
                     setSelectedTag={setSelectedTag}
                     selectedTag={selectedTag}
-                    onClose={() => setSidebarOpen(false)} // Pass close handler
+                    onClose={() => setSidebarOpen(false)}
                 />
             </div>
 
@@ -200,7 +258,7 @@ function Dashboard() {
                 <div className="flex-shrink-0 bg-white/80 backdrop-blur-sm border-b border-gray-200/50 shadow-sm">
                     <div className="px-8 py-6">
                         <Header />
-                    </div>
+                    </div>  
                 </div>
                 
                 {/* Content Area */}
@@ -218,6 +276,19 @@ function Dashboard() {
                                             sortBy={sortBy}
                                             setSortBy={setSortBy}
                                         />
+                                    <div className="mt-4">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
+                                        <select
+                                        value={statusFilter}
+                                        onChange={(e) => setStatusFilter(e.target.value)}
+                                        className="border px-3 py-2 rounded text-sm"
+                                        >
+                                        <option value="">All</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                        </select>
+                                    </div>
                                     </div>
                                     <NotesList
                                         notes={filteredNotes}
@@ -236,6 +307,10 @@ function Dashboard() {
                                         onArchiveNote={handleArchiveNote}
                                         editColor={editColor}
                                         setEditColor={setEditColor}
+                                        editStatus={editStatus}
+                                        setEditStatus={setEditStatus}
+                                        editDueDate={editDueDate}
+                                        setEditDueDate={setEditDueDate}
                                     />
                                 </>
                             )}
@@ -252,7 +327,22 @@ function Dashboard() {
                                 <NotesList
                                     notes={archivedNotes}
                                     onUnarchiveNote={handleUnarchiveNote}
-                                    // Pass other props as needed
+                                    editingNoteId={editingNoteId}
+                                    editTitle={editTitle}
+                                    setEditTitle={setEditTitle}
+                                    editContent={editContent}
+                                    setEditContent={setEditContent}
+                                    editTags={editTags}
+                                    setEditTags={setEditTags}
+                                    onStartEditing={handleStartEditing}
+                                    onCancelEditing={handleCancelEditing}
+                                    onSaveEdit={handleSaveEdit}
+                                    editColor={editColor}
+                                    setEditColor={setEditColor}
+                                    editStatus={editStatus}
+                                    setEditStatus={setEditStatus}
+                                    editDueDate={editDueDate}
+                                    setEditDueDate={setEditDueDate}
                                 />
                             )}
                         </div>

@@ -25,6 +25,14 @@ const noteSchema = new mongoose.Schema({
   isArchived: { 
     type: Boolean, 
     default: false },
+  status: {
+    type: String,
+    enum: ['Pending', 'In Progress', 'Completed'],
+    default: 'Pending' },
+  dueDate: {
+    type: Date,
+    default: null
+  }
 }, { timestamps: true });
 
 const Note = mongoose.model("note", noteSchema);

@@ -34,3 +34,5 @@ export const fetchSharedNote = (id) => API.get(`/notes/shared/${id}`);
 export const sendOTP = (email) => API.post("/send-otp", { email });
 export const verifyOTP = (data) => API.post("/verify-otp", data);
 export const resetPassword = (data) => API.post("/reset-password", data);
+
+export const fetchNotesByStatus = (status) => API.get(`/notes?status=${status}`);

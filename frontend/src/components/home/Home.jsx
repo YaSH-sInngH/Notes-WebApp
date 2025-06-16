@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser, registerUser, sendOTP, verifyOTP, resetPassword } from "../../api/api"; // Adjust path as needed
+import {toast} from 'react-toastify'
 
 export default function Home() {
   const [isLogin, setIsLogin] = useState(true);
@@ -56,25 +57,25 @@ export default function Home() {
     } catch (error) {
       const message =
         error.response?.data?.message || error.message || "Login failed";
-      alert("Login failed: " + message);
+      toast.error("Login failed: " + message);
     }
   };
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     if (registerForm.password !== registerForm.confirmPassword) {
-      alert("Passwords do not match");
+      toast.warn("Passwords do not match");
       return;
     }
 
     try {
       await registerUser(registerForm);
-      alert("Registration successful, please login");
+      toast.success("Registration successful, please login");
       setIsLogin(true);
     } catch (error) {
       const message =
         error.response?.data?.message || error.message || "Registration failed";
-      alert("Registration failed: " + message);
+      toast.error("Registration failed: " + message);
     }
   };
 
