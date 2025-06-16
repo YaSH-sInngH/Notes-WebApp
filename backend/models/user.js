@@ -14,13 +14,11 @@ const userSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
-     resetPasswordToken: {
-        type: String,
-        default: null
+    otp:{
+        type:String,
     },
-    resetPasswordExpires: {
-        type: Date,
-        default: null
+    otpExpiry:{
+        type:Date,
     }
 })
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser, registerUser } from "../../api/api"; // Adjust path as needed
+import { loginUser, registerUser, sendOTP, verifyOTP, resetPassword } from "../../api/api"; // Adjust path as needed
 
 export default function Home() {
   const [isLogin, setIsLogin] = useState(true);
@@ -10,6 +10,19 @@ export default function Home() {
     password: "",
     confirmPassword: "",
   });
+
+
+  const [isForgotPassword, setIsForgotPassword]= useState(false);
+  const [forgotPasswordStep, setForgotPasswordStep] = useState('email')
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [otp, setOtp] = useState("")
+  const [resetPasswordForm, setResetPasswordForm] = useState({
+    newPassword: "",
+    confirmPassword:""  
+  })
+  const [message, setMessage] = useState("")
+
+
 
   const [typedText, setTypedText] = useState("");
   const fullText = "Welcome to Notes App";
@@ -65,6 +78,232 @@ export default function Home() {
     }
   };
 
+    // Forgot password handlers
+  const handleSendOTP = async (e) => {
+    e.preventDefault();
+    try {
+      await sendOTP(forgotEmail);
+      setForgotPasswordStep("otp");
+      setMessage("OTP sent to your email");
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Failed to send OTP";
+      setMessage(errorMessage);
+    }
+  };
+
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+    try {
+      await verifyOTP({ email: forgotEmail, otp });
+      setForgotPasswordStep("reset");
+      setMessage("OTP verified successfully");
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Invalid or expired OTP";
+      setMessage(errorMessage);
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+  e.preventDefault();
+  if (resetPasswordForm.newPassword !== resetPasswordForm.confirmPassword) {
+    setMessage("Passwords do not match");
+    return;
+  }
+  try {
+    await resetPassword({ email: forgotEmail, newPassword: resetPasswordForm.newPassword });
+    setForgotPasswordStep("done");
+    setMessage("Password reset successful! You can now login.");
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || "Failed to reset password";
+    setMessage(errorMessage);
+  }
+};
+
+const resetForgotPasswordFlow = () => {
+  setIsForgotPassword(false);
+  setForgotPasswordStep("email");
+  setForgotEmail("");
+  setOtp("");
+  setResetPasswordForm({ newPassword: "", confirmPassword: "" }); // Fixed property name
+  setMessage("");
+};
+
+  // Render forgot password flow
+  const renderForgotPasswordFlow = () => {
+    switch (forgotPasswordStep) {
+      case "email":
+        return (
+          <form onSubmit={handleSendOTP} className="transform transition-all duration-500 ease-in-out">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">Forgot Password</h2>
+              <p className="text-gray-600">Enter your email to receive OTP</p>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                  </svg>
+                </div>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  required
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                Send OTP
+              </button>
+              
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={resetForgotPasswordFlow}
+                  className="text-blue-600 hover:text-blue-700 font-semibold underline transition-colors duration-200"
+                >
+                  Back to Login
+                </button>
+              </div>
+            </div>
+          </form>
+        );
+
+      case "otp":
+        return (
+          <form onSubmit={handleVerifyOTP} className="transform transition-all duration-500 ease-in-out">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">Enter OTP</h2>
+              <p className="text-gray-600">We sent a code to {forgotEmail}</p>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-4 4-4-4 .257-.257A6 6 0 0118 8zm-6-2a2 2 0 11-4 0 2 2 0 014 0z" clipRule="evenodd"></path>
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Enter 4-digit OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  required
+                  maxLength="4"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white text-center text-2xl tracking-widest"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                Verify OTP
+              </button>
+              
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => setForgotPasswordStep("email")}
+                  className="text-blue-600 hover:text-blue-700 font-semibold underline transition-colors duration-200"
+                >
+                  Resend OTP
+                </button>
+              </div>
+            </div>
+          </form>
+        );
+
+      case "reset":
+        return (
+          <form onSubmit={handleResetPassword} className="transform transition-all duration-500 ease-in-out">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">Reset Password</h2>
+              <p className="text-gray-600">Enter your new password</p>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"></path>
+                    </svg>
+                  </div>
+                  <input
+                    type="password"
+                    placeholder="New Password"
+                    value={resetPasswordForm.newPassword}
+                    onChange={(e) => setResetPasswordForm({...resetPasswordForm, newPassword: e.target.value})}
+                    required
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                  />
+                </div>
+                
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
+                    </svg>
+                  </div>
+                  <input
+                    type="password"
+                    placeholder="Confirm New Password"
+                    value={resetPasswordForm.confirmPassword}
+                    onChange={(e) => setResetPasswordForm({...resetPasswordForm, confirmPassword: e.target.value})}
+                    required
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold py-3 rounded-xl hover:from-green-700 hover:to-blue-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                Reset Password
+              </button>
+            </div>
+          </form>
+        );
+
+      case "done":
+        return (
+          <div className="transform transition-all duration-500 ease-in-out text-center">
+            <div className="mb-8">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-10 h-10 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                </svg>
+              </div>
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">Password Reset Successful!</h2>
+              <p className="text-gray-600">You can now login with your new password</p>
+            </div>
+            
+            <button
+              onClick={resetForgotPasswordFlow}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              Back to Login
+            </button>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* LEFT SIDE - Modern Notes Design */}
@@ -161,7 +400,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* RIGHT SIDE - Keep existing login/register design */}
+      {/* RIGHT SIDE - Authentication Forms */}
       <div className="w-full md:w-1/2 bg-white flex items-center justify-center relative overflow-hidden min-h-[320px]">
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-5">
@@ -171,100 +410,123 @@ export default function Home() {
         </div>
 
         <div className="w-full max-w-md mx-auto p-8 relative z-10">
-          {/* Form Toggle */}
-          <div className="mb-8 text-center">
-            <div className="inline-flex bg-gray-100 rounded-full p-1 shadow-inner">
-              <button
-                onClick={() => setIsLogin(true)}
-                className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 ${
-                  isLogin 
-                    ? 'bg-white text-blue-600 shadow-md transform scale-105' 
-                    : 'text-gray-600 hover:text-blue-600'
-                }`}
-              >
-                Login
-              </button>
-              <button
-                onClick={() => setIsLogin(false)}
-                className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 ${
-                  !isLogin 
-                    ? 'bg-white text-blue-600 shadow-md transform scale-105' 
-                    : 'text-gray-600 hover:text-blue-600'
-                }`}
-              >
-                Register
-              </button>
+          {/* Show message if exists */}
+          {message && (
+            <div className={`mb-4 p-3 rounded-lg text-center ${
+              message.includes('successful') || message.includes('sent') || message.includes('verified') 
+                ? 'bg-green-100 text-green-700' 
+                : 'bg-red-100 text-red-700'
+            }`}>
+              {message}
             </div>
-          </div>
+          )}
 
-          {/* Login Form */}
-          {isLogin ? (
-            <form onSubmit={handleLoginSubmit} className="transform transition-all duration-500 ease-in-out">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back!</h2>
-                <p className="text-gray-600">Please sign in to your account</p>
+          {/* Render forgot password flow or regular login/register */}
+          {isForgotPassword ? (
+            renderForgotPasswordFlow()
+          ) : (
+            <>
+              {/* Form Toggle */}
+              <div className="mb-8 text-center">
+                <div className="inline-flex bg-gray-100 rounded-full p-1 shadow-inner">
+                  <button
+                    onClick={() => setIsLogin(true)}
+                    className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 ${
+                      isLogin 
+                        ? 'bg-white text-blue-600 shadow-md transform scale-105' 
+                        : 'text-gray-600 hover:text-blue-600'
+                    }`}
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => setIsLogin(false)}
+                    className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 ${
+                      !isLogin 
+                        ? 'bg-white text-blue-600 shadow-md transform scale-105' 
+                        : 'text-gray-600 hover:text-blue-600'
+                    }`}
+                  >
+                    Register
+                  </button>
+                </div>
               </div>
-              
-              <div className="space-y-6">
-                <div className="space-y-4">
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
-                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
-                      </svg>
-                    </div>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Email address"
-                      value={loginForm.email}
-                      onChange={handleLoginChange}
-                      required
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
-                    />
+
+              {/* Login Form */}
+              {isLogin ? (
+                <form onSubmit={handleLoginSubmit} className="transform transition-all duration-500 ease-in-out">
+                  <div className="text-center mb-8">
+                    <h2 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back!</h2>
+                    <p className="text-gray-600">Please sign in to your account</p>
                   </div>
                   
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"></path>
-                      </svg>
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                          </svg>
+                        </div>
+                        <input
+                          type="email"
+                          name="email"
+                          placeholder="Email address"
+                          value={loginForm.email}
+                          onChange={handleLoginChange}
+                          required
+                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                        />
+                      </div>
+                      
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"></path>
+                          </svg>
+                        </div>
+                        <input
+                          type="password"
+                          name="password"
+                          placeholder="Password"
+                          value={loginForm.password}
+                          onChange={handleLoginChange}
+                          required
+                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                        />
+                      </div>
                     </div>
-                    <input
-                      type="password"
-                      name="password"
-                      placeholder="Password"
-                      value={loginForm.password}
-                      onChange={handleLoginChange}
-                      required
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
-                    />
-                  </div>
-                </div>
 
-                <button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-                >
-                  Sign In
-                </button>
-                
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">
-                    Don't have an account?{" "}
                     <button
-                      type="button"
-                      onClick={() => setIsLogin(false)}
-                      className="text-blue-600 hover:text-blue-700 font-semibold underline transition-colors duration-200"
+                      type="submit"
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
                     >
-                      Create one now
+                      Sign In
                     </button>
-                  </p>
-                </div>
-              </div>
-            </form>
-          ) : (
+                    
+                    <div className="text-center space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsForgotPassword(true)}
+                        className="text-blue-600 hover:text-blue-700 font-semibold underline transition-colors duration-200 block"
+                      >
+                        Forgot Password?
+                      </button>
+                      <p className="text-sm text-gray-600">
+                        Don't have an account?{" "}
+                        <button
+                          type="button"
+                          onClick={() => setIsLogin(false)}
+                          className="text-blue-600 hover:text-blue-700 font-semibold underline transition-colors duration-200"
+                        >
+                          Create one now
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+                </form>
+              ) : (
             // Register Form
             <form onSubmit={handleRegisterSubmit} className="transform transition-all duration-500 ease-in-out">
               <div className="text-center mb-8">
@@ -274,11 +536,10 @@ export default function Home() {
               
               <div className="space-y-6">
                 <div className="space-y-4">
-                  <div className="relative">
+                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
-                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                        <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
                       </svg>
                     </div>
                     <input
@@ -290,42 +551,45 @@ export default function Home() {
                       required
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
                     />
-                  </div>
-                  
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"></path>
-                      </svg>
-                    </div>
-                    <input
-                      type="password"
-                      name="password"
-                      placeholder="Password"
-                      value={registerForm.password}
-                      onChange={handleRegisterChange}
-                      required
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
-                    />
-                  </div>
-                  
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
-                      </svg>
-                    </div>
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      placeholder="Confirm Password"
-                      value={registerForm.confirmPassword}
-                      onChange={handleRegisterChange}
-                      required
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
-                    />
-                  </div>
                 </div>
+
+                {/* PASSWORD INPUT */}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"></path>
+                    </svg>
+                  </div>
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    value={registerForm.password}
+                    onChange={handleRegisterChange}
+                    required
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                  />
+                </div>
+
+                {/* CONFIRM PASSWORD INPUT */}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
+                    </svg>
+                  </div>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    placeholder="Confirm Password"
+                    value={registerForm.confirmPassword}
+                    onChange={handleRegisterChange}
+                    required
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                  />
+                </div>
+              </div>
+
 
                 <button
                   type="submit"
@@ -349,46 +613,48 @@ export default function Home() {
               </div>
             </form>
           )}
-        </div>
-      </div>
-
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-12px) rotate(1deg); }
-        }
-        
-        @keyframes float-delayed {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-15px) rotate(-1deg); }
-        }
-        
-        @keyframes float-slow {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-8px) rotate(0.5deg); }
-        }
-        
-        @keyframes float-reverse {
-          0%, 100% { transform: translateY(-5px) rotate(0deg); }
-          50% { transform: translateY(8px) rotate(-0.5deg); }
-        }
-        
-        .animate-float {
-          animation: float 4s ease-in-out infinite;
-        }
-        
-        .animate-float-delayed {
-          animation: float-delayed 5s ease-in-out infinite 0.5s;
-        }
-        
-        .animate-float-slow {
-          animation: float-slow 6s ease-in-out infinite 1s;
-        }
-        
-        .animate-float-reverse {
-          animation: float-reverse 4.5s ease-in-out infinite 1.5s;
-        }
-      `}</style>
+        </>
+      )}
     </div>
-  );
-}
+  </div>
+
+  <style>{`
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-12px) rotate(1deg); }
+    }
+    
+    @keyframes float-delayed {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(-1deg); }
+    }
+    
+    @keyframes float-slow {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(0.5deg); }
+    }
+    
+    @keyframes float-reverse {
+      0%, 100% { transform: translateY(-5px) rotate(0deg); }
+      50% { transform: translateY(8px) rotate(-0.5deg); }
+    }
+    
+    .animate-float {
+      animation: float 4s ease-in-out infinite;
+    }
+    
+    .animate-float-delayed {
+      animation: float-delayed 5s ease-in-out infinite 0.5s;
+    }
+    
+    .animate-float-slow {
+      animation: float-slow 6s ease-in-out infinite 1s;
+    }
+    
+    .animate-float-reverse {
+      animation: float-reverse 4.5s ease-in-out infinite 1.5s;
+    }
+  `}</style>
+</div>
+);
+} 

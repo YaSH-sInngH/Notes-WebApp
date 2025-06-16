@@ -13,7 +13,7 @@ API.interceptors.request.use((config) => {
 
 export const registerUser = (data) => API.post("/register", data);
 export const loginUser = (data) => API.post("/login", data);
-
+export const forgotPassword = (data) => API.post("/forgot-password", data);
 
 export const fetchNotes = () => API.get("/notes");
 export const createNote = (data) => API.post("/notes", data);
@@ -29,3 +29,8 @@ export const unarchiveNote = (id) => API.put(`/notes/unarchive/${id}`);
 export const fetchArchivedNotes = () => API.get("/notes/archived");
 
 export const fetchSharedNote = (id) => API.get(`/notes/shared/${id}`);
+
+
+export const sendOTP = (email) => API.post("/send-otp", { email });
+export const verifyOTP = (data) => API.post("/verify-otp", data);
+export const resetPassword = (data) => API.post("/reset-password", data);
