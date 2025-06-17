@@ -18,6 +18,7 @@ const PRESET_COLORS = [
 function AddTaskModal({ onClose, onAddNote }) {
     const formRef = useRef();
     const [status, setStatus] = useState("Pending");
+    const [priority, setPriority] = useState("Medium");
     const [formData, setFormData] = useState({
         title: '',
         content: '',
@@ -43,7 +44,8 @@ function AddTaskModal({ onClose, onAddNote }) {
                 content: formData.content,  
                 tags: formData.tags,
                 color: formData.color,
-                status: status, // Pass the status to onAddNote
+                status: status,
+                priority: priority,
                 dueDate: dueDate ? new Date(dueDate) : null
             });
             onClose();
@@ -159,6 +161,20 @@ function AddTaskModal({ onClose, onAddNote }) {
                                     <option value="Pending">Pending</option>
                                     <option value="In Progress">In Progress</option>
                                     <option value="Completed">Completed</option>
+                                </select>
+                            </div>
+
+                            {/* Priority */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                                <select
+                                    value={priority}
+                                    onChange={(e) => setPriority(e.target.value)}
+                                    className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                >
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
                                 </select>
                             </div>
 

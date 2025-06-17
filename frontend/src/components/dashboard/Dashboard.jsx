@@ -7,6 +7,9 @@ import NotesList from './NotesList';
 import TrashList from './TrashList';
 import AddTaskModal from './AddTaskModel';
 import { toast } from 'react-toastify';
+import NotificationIcon from './NotificationIcon';
+import { useNotifications } from '../hook/useNotifications';
+
 
 function Dashboard() {
     const [notes, setNotes] = useState([]);
@@ -27,6 +30,14 @@ function Dashboard() {
     const [statusFilter, setStatusFilter] = useState('');
     const [editStatus, setEditStatus] = useState('Pending');
     const [editDueDate, setEditDueDate] = useState("");
+    const [editPriority, setEditPriority] = useState('Medium')
+
+    const {
+        notifications,
+        dismissNotification,
+        dismissAllNotifications,
+        clearDismissedNotifications
+    } = useNotifications(notes);
 
     const allTags = Array.from(new Set(notes.flatMap(note => note.tags || [])));
 
@@ -43,7 +54,7 @@ function Dashboard() {
         }
     };
 
-    const handleAddNote = async ({ title, content, tags, color, status, dueDate }) => {
+    const handleAddNote = async ({ title, content, tags, color, status, priority, dueDate }) => {
         try {
             const newNote = {
                 title,
@@ -51,6 +62,7 @@ function Dashboard() {
                 tags: tags.split(',').map(tag => tag.trim()).filter(Boolean),
                 color,
                 status,
+                priority,
                 dueDate: dueDate || null
             };
             const res = await createNote(newNote);
@@ -69,6 +81,7 @@ function Dashboard() {
         setEditColor(note.color || '#ffffff');
         setEditStatus(note.status || 'Pending');
         setEditDueDate(note.dueDate ? new Date(note.dueDate).toISOString().split('T')[0] : '');
+        setEditPriority(note.priority || 'Medium');
     };
 
     const handleCancelEditing = () => {
@@ -79,6 +92,7 @@ function Dashboard() {
         setEditColor('#ffffff');
         setEditStatus('Pending');
         setEditDueDate('');
+        setEditPriority('Medium');
     };
 
     const handleSaveEdit = async (noteId, field, value) => {
@@ -99,6 +113,7 @@ function Dashboard() {
                     tags: editTags.split(',').map(tag => tag.trim()).filter(Boolean),
                     color: editColor,
                     status: editStatus,
+                    priority: editPriority,
                     dueDate: editDueDate || null
                 };
             }
@@ -209,6 +224,26 @@ function Dashboard() {
         .sort((a, b) => {
             if (sortBy === 'pinned') return b.pinned - a.pinned;
             if (sortBy === 'updatedAt') return new Date(b.updatedAt) - new Date(a.updatedAt);
+            if (sortBy === 'duedateAsc') {
+                if (!a.dueDate && !b.dueDate) return 0;
+                if (!a.dueDate) return 1;
+                if (!b.dueDate) return -1;
+                return new Date(a.dueDate) - new Date(b.dueDate);
+            }
+            if (sortBy === 'duedateDesc'){
+                if (!a.dueDate && !b.dueDate) return 0;
+                if (!a.dueDate) return 1;
+                if (!b.dueDate) return -1;
+                return new Date(b.dueDate) - new Date(a.dueDate);
+            }
+            if(sortBy === 'priorityHightoLow'){
+                const priorityOrder = {'High':3, 'Medium':2, 'Low':1};
+                return (priorityOrder[b.priority] || 2) - (priorityOrder[a.priority] || 2)
+            }
+            if(sortBy === 'priorityLowtoHigh'){
+                const priorityOrder = {'High':3, 'Medium':2, 'Low':1};
+                return (priorityOrder[a.priority] || 2) - (priorityOrder[b.priority] || 2);
+            }
             return new Date(b.createdAt) - new Date(a.createdAt);
         });
 
@@ -251,14 +286,22 @@ function Dashboard() {
                     onClose={() => setSidebarOpen(false)}
                 />
             </div>
-
+            
             {/* Main Content Area */}
-            <div className="flex-1 md:ml-80 flex flex-col h-full">
-                {/* Header */}
-                <div className="flex-shrink-0 bg-white/80 backdrop-blur-sm border-b border-gray-200/50 shadow-sm">
-                    <div className="px-8 py-6">
-                        <Header />
-                    </div>  
+            <div className="flex-1 ml-0 md:ml-72 lg:ml-80 flex flex-col h-full">
+            
+            {/* Fixed Header with proper z-index */}
+                <div className="flex-shrink-0 bg-white/80 backdrop-blur-sm border-b border-gray-200/50 shadow-sm relative z-30 md:z-40">
+                    <div className="px-4 sm:px-6 md:px-8 py-4 sm:py-6 flex justify-between items-center">
+                        <Header/>
+                        <div className="relative z-50">
+                            <NotificationIcon
+                                notifications={notifications}
+                                onDismiss={dismissNotification}
+                                onDismissAll={dismissAllNotifications}
+                            />
+                        </div>
+                    </div> 
                 </div>
                 
                 {/* Content Area */}
@@ -311,6 +354,8 @@ function Dashboard() {
                                         setEditStatus={setEditStatus}
                                         editDueDate={editDueDate}
                                         setEditDueDate={setEditDueDate}
+                                        editPriority={editPriority}
+                                        setEditPriority={setEditPriority}
                                     />
                                 </>
                             )}
@@ -362,11 +407,11 @@ function Dashboard() {
             {/* Hamburger Button for Mobile */}
             {!sidebarOpen && (
                 <button
-                    className="md:hidden fixed top-4 left-4 z-50 bg-white rounded-full p-2 shadow-lg"
+                    className="md:hidden fixed top-6 left-4 z-[70] bg-white rounded-full p-2 shadow-lg border border-gray-200"
                     onClick={() => setSidebarOpen(true)}
                     aria-label="Open sidebar"
                 >
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>

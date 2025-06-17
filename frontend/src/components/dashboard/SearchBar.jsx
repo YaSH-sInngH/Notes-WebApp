@@ -52,6 +52,10 @@ function SearchBar({ search, setSearch, showPinned, setShowPinned, sortBy, setSo
                         >
                             <option value="createdAt">📅 Newest First</option>
                             <option value="updatedAt">✏️ Last Edited</option>
+                            <option value="duedateAsc">📅 Due Date (Earliest)</option>
+                            <option value="duedateDesc">📅 Due Date (Latest)</option>
+                            <option value="priorityHightoLow">🔴 Priority (High to Low)</option>
+                            <option value="priorityLowtoHigh">🟢 Priority (Low to High)</option>
                         </select>
                         <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                             <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

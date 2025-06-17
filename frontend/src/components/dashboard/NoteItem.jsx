@@ -30,7 +30,9 @@ function NoteItem({
     editStatus,
     setEditStatus,
     editDueDate,
-    setEditDueDate
+    setEditDueDate,
+    editPriority,
+    setEditPriority
 }) {
     const isEditing = editingNoteId === note._id;
 
@@ -52,6 +54,19 @@ function NoteItem({
         if (!dueDate) return false;
         return new Date(dueDate) < new Date() && note.status !== 'Completed';
     };
+
+    // Helper function for priority
+    const getPriorityColor = (priority)=>{
+        switch(priority){
+            case 'High':
+                return 'text-red-700 bg-red-100 border-red-200';
+            case 'Medium':
+                return 'text-yellow-700 bg-yellow-100 border-yellow-200';
+            case 'Low':
+            default: 
+                return 'text-green-700 bg-green-100 border-green-200';
+        }
+    }
 
     return (
         <li
@@ -123,6 +138,19 @@ function NoteItem({
                         />
                     </div>
 
+                    <div className="mb-2 sm:mb-3">
+                        <label className="block text-sm font-semibold text-gray-700 mb-1 sm:mb-2">Priority</label>
+                        <select
+                            value={editPriority}
+                            onChange={(e) => setEditPriority(e.target.value)}
+                            className="border px-2 py-1 rounded w-full text-sm"
+                        >
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+
                     <div className="space-y-2 mb-2 sm:mb-3">
                         <label className="block text-sm font-semibold text-gray-700 mb-1 sm:mb-2">
                             Note Color
@@ -174,6 +202,13 @@ function NoteItem({
                     <div className="mb-2">
                         <span className={`inline-block text-xs font-medium px-2 py-1 rounded-full ${getStatusColor(note.status)}`}>
                             {note.status || "Pending"}
+                        </span>
+                    </div>
+
+                    {/* Priority Badge */}
+                    <div className="mb-2">
+                        <span className={`inline-block text-xs font-medium px-2 py-1 rounded-full border ${getPriorityColor(note.priority)}`}>
+                            {note.priority || 'Medium'}
                         </span>
                     </div>
 

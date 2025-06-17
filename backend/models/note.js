@@ -32,7 +32,12 @@ const noteSchema = new mongoose.Schema({
   dueDate: {
     type: Date,
     default: null
-  }
+  },
+  priority: {
+    type: String,
+    enum: ['Low', 'Medium', 'High'],
+    default: 'Medium'
+  },
 }, { timestamps: true });
 
 const Note = mongoose.model("note", noteSchema);
