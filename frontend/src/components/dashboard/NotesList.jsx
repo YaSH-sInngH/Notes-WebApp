@@ -16,7 +16,7 @@ function NotesList(props) {
     }
     
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 px-2 sm:px-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 px-2 md:px-0">
             {notes.map(note => (
                 <NoteItem key={note._id} note={note} {...rest} />
             ))}

@@ -1,6 +1,6 @@
 function Sidebar({ activeSection, setActiveSection, allTags, onTagClick, setSelectedTag, selectedTag, onClose }) {
     return (
-        <aside className="h-screen bg-gradient-to-b from-slate-900 via-blue-900 to-slate-900 text-white flex flex-col py-8 px-6 w-72 md:w-80 shadow-2xl border-r border-blue-800/30 relative overflow-hidden">
+        <aside className="h-screen bg-gradient-to-b from-slate-900 via-blue-900 to-slate-900 text-white flex flex-col py-8 px-6 w-72 xl:w-80 shadow-2xl border-r border-blue-800/30 relative overflow-hidden">
             {/* Close button for mobile */}
             {typeof onClose === 'function' && (
                 <button

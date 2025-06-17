@@ -266,7 +266,7 @@ function Dashboard() {
             {/* Overlay for mobile */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/40 z-40 md:hidden"
+                    className="fixed inset-0 bg-black/40 z-40 lg:hidden"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
@@ -274,7 +274,7 @@ function Dashboard() {
             <div className={`
                 fixed left-0 top-0 h-full z-50 transition-transform duration-300
                 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-                md:translate-x-0 md:fixed md:block
+                lg:translate-x-0 lg:fixed lg:block
             `}>
                 <Sidebar
                     activeSection={activeSection}
@@ -288,7 +288,7 @@ function Dashboard() {
             </div>
             
             {/* Main Content Area */}
-            <div className="flex-1 ml-0 md:ml-72 lg:ml-80 flex flex-col h-full">
+            <div className="flex-1 ml-0 lg:ml-72 xl:ml-80 flex flex-col h-full">
             
             {/* Fixed Header with proper z-index */}
                 <div className="flex-shrink-0 bg-white/80 backdrop-blur-sm border-b border-gray-200/50 shadow-sm relative z-30 md:z-40">
@@ -307,7 +307,7 @@ function Dashboard() {
                 {/* Content Area */}
                 <div className="flex-1 overflow-hidden">
                     <div className="h-full overflow-y-auto">
-                        <div className="px-8 py-6">
+                        <div className="px-8 md:px-8 py-6">
                             {activeSection === "notes" && (
                                 <>
                                     <div className="mb-8">
@@ -407,7 +407,7 @@ function Dashboard() {
             {/* Hamburger Button for Mobile */}
             {!sidebarOpen && (
                 <button
-                    className="md:hidden fixed top-6 left-4 z-[70] bg-white rounded-full p-2 shadow-lg border border-gray-200"
+                    className="lg:hidden fixed top-6 left-4 z-[70] bg-white rounded-full p-2 shadow-lg border border-gray-200"
                     onClick={() => setSidebarOpen(true)}
                     aria-label="Open sidebar"
                 >
